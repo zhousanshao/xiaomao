@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>洛克王国风格 - 年糕 vs 小宝 PK对战</title>
+    <style>
+        /* 全局样式 - 仿洛克王国复古童话风格 */
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", "幼圆", "Comic Sans MS", serif;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f0f8ff; /* 页面背景浅蓝，突出游戏框 */
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        /* 对战主容器 - 带木纹边框+内发光（背景图移至此处） */
+        .battle-container {
+            width: 1100px;
+            height: 720px;
+            background: url("https://ts4.tc.mm.bing.net/th/id/OIP-C.QnH_ONh4t19UJ5GuYK1ODAHaEU?rs=1&pid=ImgDetMain&o=7&rm=3") no-repeat center center;
+            background-size: cover;
+            border: 10px solid #d4b16a;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(212, 177, 106, 0.8), inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        /* 宠物站位区域 - 半透明遮罩，不遮挡背景图 */
+        .pet-area {
+            width: 100%;
+            height: 420px;
+            display: flex;
+            justify-content: space-between;
+            padding: 30px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.15); /* 半透明遮罩，保留背景图可见 */
+        }
+
+        /* 宠物卡片 - 调整布局，避免遮挡血条 */
+        .pet-card {
+            width: 380px; /* 加宽卡片 */
+            height: 380px;
+            position: relative;
+            filter: drop-shadow(0 0 15px rgba(0,0,0,0.2));
+            display: flex;
+            flex-direction: column;
+        }
+        .player-pet {
+            align-items: flex-start;
+            justify-content: flex-end;
+        }
+        .enemy-pet {
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+
+        /* 宠物形象 - 调整位置，完全避开血条面板 */
+        .pet-img {
+            width: 240px;
+            height: 240px;
+            border-radius: 50%;
+            border: 8px solid #fff;
+            box-shadow: 
+                0 0 0 4px #ffd700,
+                0 0 20px rgba(255, 215, 0, 0.6),
+                0 0 40px rgba(255, 215, 0, 0.3);
+            background: linear-gradient(45deg, #f8f8f8, #e8e8e8);
+            object-fit: cover;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 5;
+        }
+        .player-pet .pet-img {
+            margin-top: 10px; /* 下移图片，避开上方血条 */
+        }
+        .enemy-pet .pet-img {
+            margin-bottom: 10px; /* 上移图片，避开下方血条 */
+        }
+        /* 宠物受击/回血特效 */
+        .pet-img.attack-effect {
+            animation: attackShake 0.5s ease;
+        }
+        .pet-img.heal-effect {
+            animation: healGlow 0.8s ease;
+        }
+        .pet-img.control-effect {
+            animation: controlBlur 1s ease;
+        }
+
+        /* 宠物信息面板 - 调整层级和位置，确保不被遮挡 */
+        .pet-info {
+            width: 320px;
+            height: 90px;
+            background: linear-gradient(135deg, rgba(30, 30, 60, 0.85) 0%, rgba(10, 10, 40, 0.85) 100%);
+            border-radius: 15px;
+            padding: 12px 15px;
+            color: #fff;
+            position: relative;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.1);
+            border: 2px solid #ffd700;
+            z-index: 6; /* 提高层级，确保在图片上方 */
+            margin-bottom: 15px; /* 玩家血条与图片间距 */
+        }
+        .enemy-pet .pet-info {
+            margin-top: 15px; /* 敌方血条与图片间距 */
+        }
+        .pet-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .pet-level {
+            font-size: 16px;
+            color: #99ccff;
+            margin-bottom: 8px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        /* HP血条容器 */
+        .hp-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .hp-label {
+            font-size: 16px;
+            color: #ff6666;
+            font-weight: bold;
+        }
+        .hp-bar {
+            flex: 1;
+            height: 18px;
+            background: linear-gradient(135deg, #222 0%, #333 100%);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #666;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .hp-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #ff6666 0%, #ff4444 50%, #ff2222 100%);
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+        .hp-text {
+            font-size: 14px;
+            color: #fff;
+            min-width: 70px;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+        }
+
+        /* 战斗日志区域 - 移至宠物区下方、技能池上方 */
+        .battle-log-wrapper {
+            width: 100%;
+            height: 110px;
+            padding: 0 20px;
+            background: rgba(155, 123, 72, 0.4); /* 半透明木纹遮罩 */
+            border-top: 2px solid #d4b16a;
+            border-bottom: 2px solid #d4b16a;
+        }
+        .battle-log {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(20,20,40,0.7) 100%);
+            border-radius: 15px;
+            padding: 12px 15px;
+            color: #fff;
+            font-size: 15px;
+            overflow-y: auto;
+            z-index: 10;
+            border: 2px solid #ffd700;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+        }
+        /* 日志滚动条美化 */
+        .battle-log::-webkit-scrollbar {
+            width: 8px;
+        }
+        .battle-log::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 4px;
+        }
+        .battle-log::-webkit-scrollbar-thumb {
+            background: #ffd700;
+            border-radius: 4px;
+        }
+
+        /* 技能池区域 - 洛克王国经典木纹+金色镶边 */
+        .skill-pool {
+            width: 100%;
+            height: 230px;
+            background: linear-gradient(180deg, #9b7b48 0%, #8b6914 50%, #7a5a00 100%);
+            border-top: 8px solid #d4b16a;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 8;
+        }
+
+        /* 技能按钮 - 魔法水晶按钮风格（超精美） */
+        .skill-btn {
+            background: linear-gradient(135deg, #4a90e2 0%, #2962ff 50%, #1a4999 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 10px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 6px 0 #1a4999,
+                0 8px 15px rgba(0,0,0,0.3),
+                inset 0 2px 0 rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        /* 技能按钮纹理 */
+        .skill-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .skill-btn::after {
+            content: "PP: ";
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 14px;
+            color: #ffff99;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .skill-btn:disabled {
+            background: linear-gradient(135deg, #888 0%, #666 50%, #444 100%);
+            cursor: not-allowed;
+            box-shadow: 0 6px 0 #444, 0 8px 15px rgba(0,0,0,0.3);
+            opacity: 0.7;
+            transform: translateY(2px);
+        }
+        .skill-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #6aa8ff 0%, #4a90e2 50%, #2962ff 100%);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 0 #1a4999,
+                0 12px 20px rgba(0,0,0,0.4),
+                0 0 20px rgba(74, 144, 226, 0.5);
+        }
+        .skill-btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: 
+                0 4px 0 #1a4999,
+                0 6px 10px rgba(0,0,0,0.3);
+        }
+        /* 技能PP数值 */
+        .skill-pp {
+            position: absolute;
+            bottom: 8px;
+            right: 40px;
+            font-size: 14px;
+            color: #ffff99;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* 回合提示 - 悬浮气泡+发光特效 */
+        .round-tip {
+            position: absolute;
+            top: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffc107 100%);
+            color: #8b4513;
+            font-weight: bold;
+            font-size: 18px;
+            border-radius: 30px;
+            display: none;
+            z-index: 15;
+            box-shadow: 
+                0 4px 15px rgba(255, 215, 0, 0.6),
+                0 0 20px rgba(255, 215, 0, 0.4);
+            text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+            border: 2px solid #fff;
+            animation: tipFloat 2s ease-in-out infinite;
+        }
+
+        /* 胜利/失败提示弹窗 - 魔法弹窗风格 */
+        .result-modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 220px;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,60,0.9) 100%);
+            border: 8px solid #ffd700;
+            border-radius: 25px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            z-index: 20;
+            box-shadow: 
+                0 0 50px rgba(255, 215, 0, 0.8),
+                inset 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+        .result-text {
+            font-size: 32px;
+            margin-bottom: 25px;
+            color: #ff6600;
+            font-weight: bold;
+            text-shadow: 0 2px 10px rgba(255, 102, 0, 0.8);
+            animation: resultPulse 1.5s ease-in-out infinite;
+        }
+        .restart-btn {
+            padding: 12px 40px;
+            background: linear-gradient(135deg, #ff6600 0%, #ff4500 50%, #e03e00 100%);
+            border: none;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 
+                0 6px 0 #b33c00,
+                0 8px 15px rgba(0,0,0,0.3);
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+        .restart-btn:hover {
+            background: linear-gradient(135deg, #ff8800 0%, #ff6600 50%, #ff4500 100%);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 0 #b33c00,
+                0 10px 20px rgba(0,0,0,0.4);
+        }
+        .restart-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 0 #b33c00;
+        }
+
+        /* 技能特效动画 */
+        @keyframes attackShake {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(5deg) scale(1.1); }
+            50% { transform: rotate(-5deg) scale(1.1); }
+            75% { transform: rotate(5deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+        @keyframes healGlow {
+            0% { filter: brightness(1) hue-rotate(0deg); }
+            50% { filter: brightness(1.3) hue-rotate(20deg); }
+            100% { filter: brightness(1) hue-rotate(0deg); }
+        }
+        @keyframes controlBlur {
+            0% { filter: grayscale(0) blur(0px); }
+            50% { filter: grayscale(0.7) blur(3px); }
+            100% { filter: grayscale(0) blur(0px); }
+        }
+        @keyframes tipFloat {
+            0% { transform: translateX(-50%) translateY(0px); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+            100% { transform: translateX(-50%) translateY(0px); }
+        }
+        @keyframes resultPulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* 技能释放粒子特效（伪元素实现） */
+        .skill-effect {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 215, 0, 0.6);
+            z-index: 18;
+            animation: skillExplode 1s ease-out forwards;
+            display: none;
+        }
+        @keyframes skillExplode {
+            0% { transform: scale(0); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="battle-container">
+        <!-- 宠物对战区域 -->
+        <div class="pet-area">
+            <!-- 玩家宠物（左侧：年糕） -->
+            <div class="pet-card player-pet">
+                <div class="pet-info">
+                    <div class="pet-name">年糕</div>
+                    <div class="pet-level">等级：20</div>
+                    <div class="hp-container">
+                        <span class="hp-label">HP</span>
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="playerHpFill"></div>
+                        </div>
+                        <span class="hp-text" id="playerHpText">120/120</span>
+                    </div>
+                </div>
+                <img src="https://s41.ax1x.com/2025/12/09/pZuKotA.png" alt="年糕" class="pet-img" id="playerPetImg">
+            </div>
+
+            <!-- 敌方宠物（右侧：小宝） -->
+            <div class="pet-card enemy-pet">
+                <img src="https://s41.ax1x.com/2025/12/09/pZuKv7Q.png" alt="小宝" class="pet-img" id="enemyPetImg">
+                <div class="pet-info">
+                    <div class="pet-name">小宝</div>
+                    <div class="pet-level">等级：20</div>
+                    <div class="hp-container">
+                        <span class="hp-label">HP</span>
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="enemyHpFill"></div>
+                        </div>
+                        <span class="hp-text" id="enemyHpText">120/120</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 技能粒子特效容器 -->
+            <div class="skill-effect" id="skillEffect"></div>
+
+            <!-- 回合提示 -->
+            <div class="round-tip" id="roundTip">你的回合！选择技能出击～</div>
+        </div>
+
+        <!-- 战斗日志区域（移至宠物区下方、技能池上方） -->
+        <div class="battle-log-wrapper">
+            <div class="battle-log" id="battleLog">
+                [系统] 战斗开始！年糕 vs 小宝
+            </div>
+        </div>
+
+        <!-- 技能池区域 -->
+        <div class="skill-pool">
+            <button class="skill-btn" id="skill1" data-type="attack" data-damage="18" data-pp="12">
+                利爪突袭
+                <span class="skill-pp">12</span>
+            </button>
+            <button class="skill-btn" id="skill2" data-type="magic" data-damage="28" data-pp="8">
+                魔法飞弹
+                <span class="skill-pp">8</span>
+            </button>
+            <button class="skill-btn" id="skill3" data-type="heal" data-damage="-15" data-pp="5">
+                治愈舔毛
+                <span class="skill-pp">5</span>
+            </button>
+            <button class="skill-btn" id="skill4" data-type="control" data-damage="10" data-pp="4">
+                催眠爪
+                <span class="skill-pp">4</span>
+            </button>
+        </div>
+
+        <!-- 胜负提示弹窗 -->
+        <div class="result-modal" id="resultModal">
+            <div class="result-text" id="resultText"></div>
+            <button class="restart-btn" id="restartBtn">重新对战</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. 游戏核心数据
+        const gameData = {
+            // 玩家宠物数据（年糕）
+            player: {
+                hp: 120,
+                maxHp: 120,
+                level: 20,
+                isStunned: false // 是否被控制（催眠）
+            },
+            // 敌方宠物数据（小宝）
+            enemy: {
+                hp: 120,
+                maxHp: 120,
+                level: 20,
+                isStunned: false
+            },
+            // 4个技能的PP数据
+            skills: {
+                skill1: { pp: 12, maxPp: 12 }, // 利爪突袭
+                skill2: { pp: 8, maxPp: 8 },  // 魔法飞弹
+                skill3: { pp: 5, maxPp: 5 },  // 治愈舔毛
+                skill4: { pp: 4, maxPp: 4 }   // 催眠爪
+            },
+            isBattleEnd: false,
+            currentRound: 1,
+            isEnemyTurn: false // 新增：标记是否为敌方回合，防止玩家中途操作
+        };
+
+        // 2. DOM元素获取
+        const playerHpFill = document.getElementById('playerHpFill');
+        const playerHpText = document.getElementById('playerHpText');
+        const enemyHpFill = document.getElementById('enemyHpFill');
+        const enemyHpText = document.getElementById('enemyHpText');
+        const battleLog = document.getElementById('battleLog');
+        const roundTip = document.getElementById('roundTip');
+        const resultModal = document.getElementById('resultModal');
+        const resultText = document.getElementById('resultText');
+        const restartBtn = document.getElementById('restartBtn');
+        const skillButtons = document.querySelectorAll('.skill-btn');
+        const playerPetImg = document.getElementById('playerPetImg');
+        const enemyPetImg = document.getElementById('enemyPetImg');
+        const skillEffect = document.getElementById('skillEffect');
+
+        // 3. 初始化游戏
+        function initGame() {
+            // 重置所有核心数据
+            gameData.player.hp = gameData.player.maxHp;
+            gameData.player.isStunned = false;
+            gameData.enemy.hp = gameData.enemy.maxHp;
+            gameData.enemy.isStunned = false;
+            gameData.isBattleEnd = false;
+            gameData.currentRound = 1;
+            gameData.isEnemyTurn = false; // 重置敌方回合标记
+
+            // 重置技能PP
+            Object.keys(gameData.skills).forEach(skillId => {
+                gameData.skills[skillId].pp = gameData.skills[skillId].maxPp;
+            });
+
+            // 更新显示
+            updateHpDisplay();
+            updateSkillDisplay();
+            clearLog();
+            addLog(`[系统] 战斗开始！年糕 vs 小宝`);
+            
+            // 隐藏弹窗，显示回合提示
+            resultModal.style.display = 'none';
+            showRoundTip('你的回合！选择技能出击～');
+
+            // 解锁所有技能按钮
+            skillButtons.forEach(btn => {
+                btn.disabled = false;
+            });
+
+            // 重置宠物图片样式（清除特效）
+            playerPetImg.classList.remove('attack-effect', 'heal-effect', 'control-effect');
+            enemyPetImg.classList.remove('attack-effect', 'heal-effect', 'control-effect');
+        }
+
+        // 4. 更新HP显示
+        function updateHpDisplay() {
+            // 玩家HP
+            const playerHpPercent = (gameData.player.hp / gameData.player.maxHp) * 100;
+            playerHpFill.style.width = `${playerHpPercent}%`;
+            playerHpText.textContent = `${gameData.player.hp}/${gameData.player.maxHp}`;
+
+            // 敌方HP
+            const enemyHpPercent = (gameData.enemy.hp / gameData.enemy.maxHp) * 100;
+            enemyHpFill.style.width = `${enemyHpPercent}%`;
+            enemyHpText.textContent = `${gameData.enemy.hp}/${gameData.enemy.maxHp}`;
+        }
+
+        // 5. 更新技能PP显示
+        function updateSkillDisplay() {
+            skillButtons.forEach(btn => {
+                const skillId = btn.id;
+                const pp = gameData.skills[skillId].pp;
+                // 更新PP数值
+                btn.querySelector('.skill-pp').textContent = pp;
+                // 禁用条件：PP为0 / 战斗结束 / 玩家被控制 / 敌方回合中
+                const isDisabled = pp <= 0 || gameData.isBattleEnd || gameData.player.isStunned || gameData.isEnemyTurn;
+                btn.disabled = isDisabled;
+            });
+        }
+
+        // 6. 添加对战日志
+        function addLog(text) {
+            const time = new Date().toLocaleTimeString();
+            battleLog.innerHTML += `<br>[${time}] ${text}`;
+            // 自动滚动到底部
+            battleLog.scrollTop = battleLog.scrollHeight;
+        }
+
+        // 7. 清空日志
+        function clearLog() {
+            battleLog.innerHTML = '[系统] 战斗开始！年糕 vs 小宝';
+        }
+
+        // 8. 显示回合提示
+        function showRoundTip(text) {
+            roundTip.textContent = text;
+            roundTip.style.display = 'block';
+            // 3秒后隐藏
+            setTimeout(() => {
+                if (!gameData.isBattleEnd) {
+                    roundTip.style.display = 'none';
+                }
+            }, 3000);
+        }
+
+        // 9. 技能释放特效（增强版）
+        function playSkillEffect(isPlayer, skillType) {
+            const targetImg = isPlayer ? enemyPetImg : playerPetImg;
+            const skillEffectEl = document.getElementById('skillEffect');
+            
+            // 定位粒子特效到目标宠物位置
+            const targetRect = targetImg.getBoundingClientRect();
+            const containerRect = document.querySelector('.battle-container').getBoundingClientRect();
+            skillEffectEl.style.left = `${targetRect.left - containerRect.left + targetRect.width/2 - 50}px`;
+            skillEffectEl.style.top = `${targetRect.top - containerRect.top + targetRect.height/2 - 50}px`;
+            skillEffectEl.style.display = 'block';
+            
+            // 不同技能不同特效
+            switch (skillType) {
+                case 'attack':
+                    targetImg.classList.add('attack-effect');
+                    skillEffectEl.style.background = 'rgba(255, 102, 0, 0.7)';
+                    addLog(`💥 物理攻击特效触发！`);
+                    break;
+                case 'magic':
+                    targetImg.classList.add('attack-effect');
+                    skillEffectEl.style.background = 'rgba(102, 102, 255, 0.7)';
+                    addLog(`✨ 魔法攻击特效触发！`);
+                    break;
+                case 'heal':
+                    const selfImg = isPlayer ? playerPetImg : enemyPetImg;
+                    selfImg.classList.add('heal-effect');
+                    skillEffectEl.style.background = 'rgba(102, 255, 102, 0.7)';
+                    addLog(`❤️ 治愈特效触发！`);
+                    break;
+                case 'control':
+                    targetImg.classList.add('control-effect');
+                    skillEffectEl.style.background = 'rgba(204, 102, 255, 0.7)';
+                    addLog(`😴 控制特效触发！`);
+                    break;
+            }
+
+            // 移除特效类名
+            setTimeout(() => {
+                targetImg.classList.remove('attack-effect', 'heal-effect', 'control-effect');
+                skillEffectEl.style.display = 'none';
+            }, 1000);
+        }
+
+        // 10. 玩家释放技能（修复核心逻辑）
+        function playerUseSkill(skillBtn) {
+            // 防止战斗结束/敌方回合/玩家被控制时操作
+            if (gameData.isBattleEnd || gameData.isEnemyTurn || gameData.player.isStunned) {
+                addLog(`[提示] 无法释放技能！${gameData.player.isStunned ? '你被控制了' : '当前是敌方回合'}`);
+                return;
+            }
+
+            const skillId = skillBtn.id;
+            const skill = gameData.skills[skillId];
+            
+            // 检查PP是否足够
+            if (skill.pp <= 0) {
+                addLog(`[提示] ${skillBtn.textContent.trim().split('\n')[0]}的PP已耗尽！`);
+                return;
+            }
+
+            const damage = parseInt(skillBtn.dataset.damage);
+            const skillType = skillBtn.dataset.type;
+
+            // 标记为敌方回合，防止玩家重复操作
+            gameData.isEnemyTurn = true;
+            // 临时禁用所有技能按钮（敌方回合中）
+            skillButtons.forEach(btn => btn.disabled = true);
+
+            // 扣PP
+            skill.pp -= 1;
+            updateSkillDisplay();
+
+            // 播放技能特效
+            playSkillEffect(true, skillType);
+
+            // 执行技能效果
+            switch (skillType) {
+                case 'attack': // 物理攻击
+                    gameData.enemy.hp = Math.max(0, gameData.enemy.hp - damage);
+                    addLog(`[你的回合] 年糕使用了${skillBtn.textContent.trim().split('\n')[0]}，造成${damage}点物理伤害！`);
+                    break;
+                case 'magic': // 魔法攻击
+                    gameData.enemy.hp = Math.max(0, gameData.enemy.hp - damage);
+                    addLog(`[你的回合] 年糕使用了${skillBtn.textContent.trim().split('\n')[0]}，造成${damage}点魔法伤害！`);
+                    break;
+                case 'heal': // 回血
+                    gameData.player.hp = Math.min(gameData.player.maxHp, gameData.player.hp - damage);
+                    addLog(`[你的回合] 年糕使用了${skillBtn.textContent.trim().split('\n')[0]}，恢复了${-damage}点HP！`);
+                    break;
+                case 'control': // 控制（催眠）
+                    gameData.enemy.isStunned = true;
+                    gameData.enemy.hp = Math.max(0, gameData.enemy.hp - damage);
+                    addLog(`[你的回合] 年糕使用了${skillBtn.textContent.trim().split('\n')[0]}，造成${damage}点伤害并催眠了小宝！`);
+                    break;
+            }
+
+            // 更新HP
+            updateHpDisplay();
+
+            // 检查敌方是否战败
+            if (gameData.enemy.hp <= 0) {
+                endBattle(true);
+                gameData.isEnemyTurn = false; // 重置回合标记
+                return;
+            }
+
+            // 敌方回合（延迟1.5秒，模拟思考）
+            setTimeout(enemyTurn, 1500);
+        }
+
+        // 11. 敌方回合（修复技能失效BUG）
+        function enemyTurn() {
+            if (gameData.isBattleEnd) {
+                gameData.isEnemyTurn = false;
+                updateSkillDisplay(); // 解锁技能按钮
+                return;
+            }
+
+            showRoundTip('对手的回合！小宝准备出招～');
+
+            // 如果被催眠，跳过回合
+            if (gameData.enemy.isStunned) {
+                addLog(`[敌方回合] 小宝被催眠了，无法行动！`);
+                gameData.enemy.isStunned = false; // 解除催眠
+                
+                // 重置回合标记，解锁技能按钮
+                gameData.isEnemyTurn = false;
+                // 恢复玩家技能按钮（排除PP耗尽的）
+                updateSkillDisplay();
+                showRoundTip('你的回合！选择技能出击～');
+                return;
+            }
+
+            // 敌方4个技能池（添加PP消耗逻辑）
+            const enemySkills = [
+                { name: '野蛮冲撞', type: 'attack', damage: 16, pp: 12, maxPp: 12 },
+                { name: '暗影球', type: 'magic', damage: 26, pp: 8, maxPp: 8 },
+                { name: '自愈', type: 'heal', damage: -13, pp: 5, maxPp: 5 },
+                { name: '恐吓爪', type: 'control', damage: 8, pp: 4, maxPp: 4 }
+            ];
+
+            // 筛选可用技能（PP>0）
+            const availableSkills = enemySkills.filter(skill => skill.pp > 0);
+            let randomSkill;
+            
+            // 如果无可用技能，敌方防御
+            if (availableSkills.length === 0) {
+                addLog(`[敌方回合] 小宝的技能PP已耗尽，只能防御！`);
+                // 重置回合标记，解锁技能按钮
+                gameData.isEnemyTurn = false;
+                updateSkillDisplay();
+                showRoundTip('你的回合！选择技能出击～');
+                return;
+            } else {
+                randomSkill = availableSkills[Math.floor(Math.random() * availableSkills.length)];
+                // 敌方扣PP
+                randomSkill.pp -= 1;
+            }
+
+            // 播放技能特效
+            playSkillEffect(false, randomSkill.type);
+
+            // 执行敌方技能效果
+            switch (randomSkill.type) {
+                case 'attack':
+                    gameData.player.hp = Math.max(0, gameData.player.hp - randomSkill.damage);
+                    addLog(`[敌方回合] 小宝使用了${randomSkill.name}，造成${randomSkill.damage}点物理伤害！`);
+                    break;
+                case 'magic':
+                    gameData.player.hp = Math.max(0, gameData.player.hp - randomSkill.damage);
+                    addLog(`[敌方回合] 小宝使用了${randomSkill.name}，造成${randomSkill.damage}点魔法伤害！`);
+                    break;
+                case 'heal':
+                    gameData.enemy.hp = Math.min(gameData.enemy.maxHp, gameData.enemy.hp - randomSkill.damage);
+                    addLog(`[敌方回合] 小宝使用了${randomSkill.name}，恢复了${-randomSkill.damage}点HP！`);
+                    break;
+                case 'control':
+                    gameData.player.isStunned = true;
+                    gameData.player.hp = Math.max(0, gameData.player.hp - randomSkill.damage);
+                    addLog(`[敌方回合] 小宝使用了${randomSkill.name}，造成${randomSkill.damage}点伤害并恐吓了年糕！`);
+                    break;
+            }
+
+            // 更新HP
+            updateHpDisplay();
+
+            // 检查玩家是否战败
+            if (gameData.player.hp <= 0) {
+                endBattle(false);
+                gameData.isEnemyTurn = false;
+                return;
+            }
+
+            // 重置回合标记，解锁玩家技能按钮
+            gameData.isEnemyTurn = false;
+            // 恢复技能按钮（根据PP和控制状态）
+            updateSkillDisplay();
+
+            // 显示玩家回合提示
+            setTimeout(() => {
+                showRoundTip(gameData.player.isStunned ? '你被控制了，本回合无法行动！' : '你的回合！选择技能出击～');
+                
+                // 如果玩家被控制，自动跳过回合
+                if (gameData.player.isStunned) {
+                    addLog(`[提示] 你被控制了，跳过本回合！`);
+                    gameData.player.isStunned = false; // 解除控制
+                    setTimeout(() => {
+                        gameData.isEnemyTurn = true;
+                        skillButtons.forEach(btn => btn.disabled = true);
+                        setTimeout(enemyTurn, 1000);
+                    }, 2000);
+                }
+            }, 1000);
+
+            // 回合数+1
+            gameData.currentRound++;
+        }
+
+        // 12. 结束战斗
+        function endBattle(isPlayerWin) {
+            gameData.isBattleEnd = true;
+            gameData.isEnemyTurn = false;
+            // 禁用所有技能
+            skillButtons.forEach(btn => btn.disabled = true);
+            // 显示结果弹窗
+            resultModal.style.display = 'flex';
+            if (isPlayerWin) {
+                resultText.textContent = '恭喜！年糕赢了～';
+                addLog(`[系统] 战斗结束！年糕击败了小宝，获得胜利！`);
+            } else {
+                resultText.textContent = '很遗憾！年糕输了～';
+                addLog(`[系统] 战斗结束！小宝击败了年糕，挑战失败！`);
+            }
+        }
+
+        // 13. 绑定事件
+        // 技能按钮点击
+        skillButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                playerUseSkill(btn);
+            });
+        });
+        // 重新开始按钮
+        restartBtn.addEventListener('click', initGame);
+
+        // 初始化游戏
+        window.onload = initGame;
+    </script>
+</body>
+</html>
