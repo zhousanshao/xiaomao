@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>洛克王国风格 - 宠物PK对战</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- 宠物选择界面 -->
+    <div class="pet-select-container" id="petSelectContainer">
+        <h1 class="select-title">选择你的宠物</h1>
+        <div class="pet-options">
+            <!-- 年糕选项 -->
+            <div class="pet-option" data-pet="niangao">
+                <img src="https://s41.ax1x.com/2025/12/09/pZuKotA.png" alt="年糕" class="pet-option-img">
+                <div class="pet-option-name">年糕</div>
+                <div class="pet-option-level">等级：20</div>
+                <div class="pet-option-hp">HP：120</div>
+                <div class="pet-option-desc">张总的神秘宠物，总是喜欢挑衅主人。</div>
+                <div class="pet-option-skills">
+                    <div class="skill-item">💥 利爪突袭：威力18，PP12</div>
+                    <div class="skill-item">✨ 魔法飞弹：威力28，PP8</div>
+                    <div class="skill-item">❤️ 治愈舔毛：恢复15，PP5</div>
+                    <div class="skill-item">😴 催眠爪：威力10，PP4</div>
+                </div>
+            </div>
+            
+            <!-- 小宝选项 -->
+            <div class="pet-option" data-pet="xiaobao">
+                <img src="https://s41.ax1x.com/2025/12/09/pZuKv7Q.png" alt="小宝" class="pet-option-img">
+                <div class="pet-option-name">小宝</div>
+                <div class="pet-option-level">等级：20</div>
+                <div class="pet-option-hp">HP：120</div>
+                <div class="pet-option-desc">断尾流浪小猫，智商在线 + 身手敏捷，抗拒贴贴却对鸡胸肉毫无抵抗力！</div>
+                <div class="pet-option-skills">
+                    <div class="skill-item">💥 利爪突袭：威力18，PP12</div>
+                    <div class="skill-item">✨ 魔法飞弹：威力28，PP8</div>
+                    <div class="skill-item">❤️ 治愈舔毛：恢复15，PP5</div>
+                    <div class="skill-item">😴 催眠爪：威力10，PP4</div>
+                </div>
+            </div>
+            
+            <!-- 张儒松选项 -->
+            <div class="pet-option" data-pet="zhangrusong">
+                <img src="https://s41.ax1x.com/2025/12/09/pZulj0O.jpg" alt="张儒松" class="pet-option-img">
+                <div class="pet-option-name">张儒松</div>
+                <div class="pet-option-level">等级：100</div>
+                <div class="pet-option-hp">HP：99</div>
+                <div class="pet-option-desc">两只小猫最严厉的母亲---其实是人形铲屎官啦！</div>
+                <div class="pet-option-skills">
+                    <div class="skill-item">✋ 无情铁手：威力25，PP5</div>
+                    <div class="skill-item">🐱 学猫叫：威力10，PP5</div>
+                    <div class="skill-item">🚮 铲屎：减少30HP，PP5</div>
+                    <div class="skill-item">⚡ 天道！：威力=对方HP，PP1</div>
+                </div>
+            </div>
+
+            <!-- 狗策划周少选项 -->
+            <div class="pet-option" data-pet="zhoushao">
+                <img src="https://s41.ax1x.com/2025/12/10/pZu4S9e.png" alt="狗策划周少" class="pet-option-img">
+                <div class="pet-option-name">狗策划周少</div>
+                <div class="pet-option-level">等级：100</div>
+                <div class="pet-option-hp">HP：99</div>
+                <div class="pet-option-desc">游戏的策划者，坚信世界都是Bug，自己才是管理者。</div>
+                <div class="pet-option-skills">
+                    <div class="skill-item">🥧 画饼充饥：恢复20，PP3</div>
+                    <div class="skill-item">🚫 拒绝加班：免疫异常，PP3</div>
+                    <div class="skill-item">🔄 篡改数据：交换HP，PP3</div>
+                    <div class="skill-item">🏃 提桶跑路：归0HP，PP1</div>
+                </div>
+            </div>
+
+        </div>
+        <button class="start-battle-btn" id="startBattleBtn">开始对战</button>
+    </div>
+
+    <!-- 对战界面 -->
+    <div class="battle-container" id="battleContainer">
+        <!-- 宠物对战区域 -->
+        <div class="pet-area">
+            <!-- 玩家宠物 -->
+            <div class="pet-card player-pet">
+                <div class="pet-info">
+                    <div class="pet-name" id="playerPetName">年糕</div>
+                    <div class="pet-level" id="playerPetLevel">等级：20</div>
+                    <div class="hp-container">
+                        <span class="hp-label">HP</span>
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="playerHpFill"></div>
+                        </div>
+                        <span class="hp-text" id="playerHpText">120/120</span>
+                    </div>
+                </div>
+                <img src="https://s41.ax1x.com/2025/12/09/pZuKotA.png" alt="玩家宠物" class="pet-img" id="playerPetImg">
+            </div>
+
+            <!-- 敌方宠物 -->
+            <div class="pet-card enemy-pet">
+                <img src="https://s41.ax1x.com/2025/12/09/pZuKv7Q.png" alt="敌方宠物" class="pet-img" id="enemyPetImg">
+                <div class="pet-info">
+                    <div class="pet-name" id="enemyPetName">小宝</div>
+                    <div class="pet-level" id="enemyPetLevel">等级：20</div>
+                    <div class="hp-container">
+                        <span class="hp-label">HP</span>
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="enemyHpFill"></div>
+                        </div>
+                        <span class="hp-text" id="enemyHpText">120/120</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 技能特效容器 -->
+            <div class="skill-effect-container" id="skillEffectContainer"></div>
+            
+            <!-- 背景BGM（新增） -->
+            <audio id="bgm" src="bgm/background-music.mp3" preload="auto" loop></audio>
+
+            <!-- 回合提示 -->
+            <div class="round-tip" id="roundTip">你的回合！选择技能出击～</div>
+        </div>
+
+        <!-- 战斗日志区域 -->
+        <div class="battle-log-wrapper">
+            <div class="battle-log" id="battleLog">
+                [系统] 战斗开始！
+            </div>
+        </div>
+
+        <!-- 技能池区域 -->
+        <div class="skill-pool" id="skillPool">
+            <!-- 技能按钮将通过JS动态生成 -->
+        </div>
+
+        <!-- 胜负提示弹窗 -->
+        <div class="result-modal" id="resultModal">
+            <div class="result-text" id="resultText"></div>
+            <button class="restart-btn" id="restartBtn">重新对战</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

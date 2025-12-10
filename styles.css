@@ -1,0 +1,751 @@
+/* 全局样式 - 仿洛克王国复古童话风格 */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: "Microsoft YaHei", "幼圆", "Comic Sans MS", serif;
+    box-sizing: border-box;
+}
+body {
+    background: linear-gradient(135deg, #0a1931 0%, #1a1a2e 50%, #16213e 100%); /* 深色渐变背景 */
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+/* 宠物选择界面 */
+.pet-select-container {
+    width: 900px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 10px solid #d4b16a;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 0 50px rgba(212, 177, 106, 0.8);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+}
+.select-title {
+    color: #ffd700;
+    font-size: 32px;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.pet-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    width: 100%;
+}
+.pet-option {
+    background: linear-gradient(135deg, rgba(30, 30, 60, 0.85) 0%, rgba(10, 10, 40, 0.85) 100%);
+    border: 3px solid #ffd700;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.pet-option:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 20px rgba(255, 215, 0, 0.5);
+}
+.pet-option.selected {
+    border-color: #ff6600;
+    box-shadow: 0 0 20px rgba(255, 102, 0, 0.8);
+}
+.pet-option-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid #fff;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+.pet-option-name {
+    color: #ffd700;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.pet-option-level {
+    color: #99ccff;
+    margin-bottom: 10px;
+}
+.pet-option-hp {
+    color: #ff6666;
+    margin-bottom: 10px;
+}
+.pet-option-desc {
+    color: #fff;
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+.pet-option-skills {
+    width: 100%;
+}
+.skill-item {
+    color: #e0e0e0;
+    font-size: 13px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+.start-battle-btn {
+    margin-top: 30px;
+    padding: 12px 40px;
+    background: linear-gradient(135deg, #ff6600 0%, #ff4500 50%, #e03e00 100%);
+    border: none;
+    border-radius: 15px;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #b33c00, 0 8px 15px rgba(0,0,0,0.3);
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.start-battle-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 0 #b33c00, 0 10px 20px rgba(0,0,0,0.4);
+}
+
+/* 对战主容器 - 带木纹边框+内发光 */
+.battle-container {
+    width: 1100px;
+    height: 720px;
+    background: url("https://ts4.tc.mm.bing.net/th/id/OIP-C.QnH_ONh4t19UJ5GuYK1ODAHaEU?rs=1&pid=ImgDetMain&o=7&rm=3") no-repeat center center;
+    background-size: cover;
+    border: 10px solid #d4b16a;
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgba(212, 177, 106, 0.8), inset 0 0 20px rgba(0,0,0,0.2);
+    display: none;
+}
+
+/* 宠物站位区域 - 半透明遮罩，不遮挡背景图 */
+.pet-area {
+    width: 100%;
+    height: 420px;
+    display: flex;
+    justify-content: space-between;
+    padding: 30px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.15); /* 半透明遮罩，保留背景图可见 */
+}
+
+/* 宠物卡片 - 调整布局，避免遮挡血条 */
+.pet-card {
+    width: 380px; /* 加宽卡片 */
+    height: 380px;
+    position: relative;
+    filter: drop-shadow(0 0 15px rgba(0,0,0,0.2));
+    display: flex;
+    flex-direction: column;
+}
+.player-pet {
+    align-items: flex-start;
+    justify-content: flex-end;
+}
+.enemy-pet {
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+/* 宠物形象 - 调整位置，完全避开血条面板 */
+.pet-img {
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 8px solid #fff;
+    box-shadow: 
+        0 0 0 4px #ffd700,
+        0 0 20px rgba(255, 215, 0, 0.6),
+        0 0 40px rgba(255, 215, 0, 0.3);
+    background: linear-gradient(45deg, #f8f8f8, #e8e8e8);
+    object-fit: cover;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 5;
+}
+.player-pet .pet-img {
+    margin-top: 10px; /* 下移图片，避开上方血条 */
+}
+.enemy-pet .pet-img {
+    margin-bottom: 10px; /* 上移图片，避开下方血条 */
+}
+/* 宠物受击/回血特效 */
+.pet-img.attack-effect {
+    animation: attackShake 0.5s ease;
+}
+.pet-img.heal-effect {
+    animation: healGlow 0.8s ease;
+}
+.pet-img.control-effect {
+    animation: controlBlur 1s ease;
+}
+
+/* 宠物信息面板 - 调整层级和位置，确保不被遮挡 */
+.pet-info {
+    width: 320px;
+    height: 90px;
+    background: linear-gradient(135deg, rgba(30, 30, 60, 0.85) 0%, rgba(10, 10, 40, 0.85) 100%);
+    border-radius: 15px;
+    padding: 12px 15px;
+    color: #fff;
+    position: relative;
+    box-shadow: 0 8px 0 rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.1);
+    border: 2px solid #ffd700;
+    z-index: 6; /* 提高层级，确保在图片上方 */
+    margin-bottom: 15px; /* 玩家血条与图片间距 */
+}
+.enemy-pet .pet-info {
+    margin-top: 15px; /* 敌方血条与图片间距 */
+}
+.pet-name {
+    font-size: 22px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+.pet-level {
+    font-size: 16px;
+    color: #99ccff;
+    margin-bottom: 8px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+/* HP血条容器 */
+.hp-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.hp-label {
+    font-size: 16px;
+    color: #ff6666;
+    font-weight: bold;
+}
+.hp-bar {
+    flex: 1;
+    height: 18px;
+    background: linear-gradient(135deg, #222 0%, #333 100%);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #666;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+}
+.hp-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #ff6666 0%, #ff4444 50%, #ff2222 100%);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.hp-text {
+    font-size: 14px;
+    color: #fff;
+    min-width: 70px;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+}
+
+/* 战斗日志区域 - 移至宠物区下方、技能池上方 */
+.battle-log-wrapper {
+    width: 100%;
+    height: 110px;
+    padding: 0 20px;
+    background: rgba(155, 123, 72, 0.4); /* 半透明木纹遮罩 */
+    border-top: 2px solid #d4b16a;
+    border-bottom: 2px solid #d4b16a;
+}
+.battle-log {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(20,20,40,0.7) 100%);
+    border-radius: 15px;
+    padding: 12px 15px;
+    color: #fff;
+    font-size: 15px;
+    overflow-y: auto;
+    z-index: 10;
+    border: 2px solid #ffd700;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+}
+/* 日志滚动条美化 */
+.battle-log::-webkit-scrollbar {
+    width: 8px;
+}
+.battle-log::-webkit-scrollbar-track {
+    background: #333;
+    border-radius: 4px;
+}
+.battle-log::-webkit-scrollbar-thumb {
+    background: #ffd700;
+    border-radius: 4px;
+}
+
+/* 技能池区域 - 洛克王国经典木纹+金色镶边 */
+.skill-pool {
+    width: 100%;
+    height: 230px;
+    background: linear-gradient(180deg, #9b7b48 0%, #8b6914 50%, #7a5a00 100%);
+    border-top: 8px solid #d4b16a;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    box-shadow: inset 0 4px 10px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 8;
+}
+
+/* 技能按钮 - 全新精美设计 */
+.skill-btn {
+    background: linear-gradient(135deg, #4a90e2 0%, #2962ff 50%, #1a4999 100%);
+    border: none;
+    border-radius: 15px;
+    padding: 15px 10px;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 6px 0 #1a4999,
+        0 8px 15px rgba(0,0,0,0.3),
+        inset 0 2px 0 rgba(255,255,255,0.3);
+    position: relative;
+    overflow: hidden;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+/* 技能图标 */
+.skill-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    text-shadow: 0 0 10px currentColor;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+/* 技能名称 */
+.skill-name {
+    font-size: 16px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    text-align: center;
+}
+/* 技能详情 */
+.skill-details {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 14px;
+    padding: 0 5px;
+}
+.skill-pp, .skill-power {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #ffff99;
+    font-weight: bold;
+}
+.skill-power {
+    color: #ff9999;
+}
+/* 技能按钮纹理 */
+.skill-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2) 0%, transparent 50%);
+    pointer-events: none;
+}
+.skill-btn:disabled {
+    background: linear-gradient(135deg, #888 0%, #666 50%, #444 100%);
+    cursor: not-allowed;
+    box-shadow: 0 6px 0 #444, 0 8px 15px rgba(0,0,0,0.3);
+    opacity: 0.7;
+    transform: translateY(2px);
+}
+.skill-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 0 #1a4999,
+        0 12px 20px rgba(0,0,0,0.4),
+        0 0 20px rgba(74, 144, 226, 0.5);
+}
+.skill-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 
+        0 4px 0 #1a4999,
+        0 6px 10px rgba(0,0,0,0.3);
+}
+/* 技能类型特定样式 */
+.skill-btn[data-type="attack"] {
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 50%, #a04000 100%);
+    box-shadow: 0 6px 0 #a04000, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="attack"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 50%, #d35400 100%);
+    box-shadow: 0 8px 0 #a04000, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(230, 126, 34, 0.5);
+}
+.skill-btn[data-type="magic"] {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #6c3483 100%);
+    box-shadow: 0 6px 0 #6c3483, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="magic"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #af7ac5 0%, #9b59b6 50%, #8e44ad 100%);
+    box-shadow: 0 8px 0 #6c3483, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(155, 89, 182, 0.5);
+}
+.skill-btn[data-type="heal"] {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 50%, #1e8449 100%);
+    box-shadow: 0 6px 0 #1e8449, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="heal"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #58d68d 0%, #2ecc71 50%, #27ae60 100%);
+    box-shadow: 0 8px 0 #1e8449, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(46, 204, 113, 0.5);
+}
+.skill-btn[data-type="control"] {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1f618d 100%);
+    box-shadow: 0 6px 0 #1f618d, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="control"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5dade2 0%, #3498db 50%, #2980b9 100%);
+    box-shadow: 0 8px 0 #1f618d, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(52, 152, 219, 0.5);
+}
+.skill-btn[data-type="self-damage"] {
+    background: linear-gradient(135deg, #7f8c8d 0%, #555 50%, #333 100%);
+    box-shadow: 0 6px 0 #333, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="self-damage"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 50%, #555 100%);
+    box-shadow: 0 8px 0 #333, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(127, 140, 141, 0.5);
+}
+.skill-btn[data-type="ultimate"] {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #922b1f 100%);
+    box-shadow: 0 6px 0 #922b1f, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="ultimate"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ff6b6b 0%, #e74c3c 50%, #c0392b 100%);
+    box-shadow: 0 8px 0 #922b1f, 0 12px 20px rgba(0,0,0,0.4), 0 0 30px rgba(231, 76, 60, 0.7);
+}
+
+/* 回合提示 - 悬浮气泡+发光特效 */
+.round-tip {
+    position: absolute;
+    top: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 25px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffc107 100%);
+    color: #8b4513;
+    font-weight: bold;
+    font-size: 18px;
+    border-radius: 30px;
+    display: none;
+    z-index: 15;
+    box-shadow: 
+        0 4px 15px rgba(255, 215, 0, 0.6),
+        0 0 20px rgba(255, 215, 0, 0.4);
+    text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+    border: 2px solid #fff;
+    animation: tipFloat 2s ease-in-out infinite;
+}
+
+/* 胜利/失败提示弹窗 - 魔法弹窗风格 */
+.result-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+    height: 220px;
+    background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30,30,60,0.9) 100%);
+    border: 8px solid #ffd700;
+    border-radius: 25px;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    z-index: 20;
+    box-shadow: 
+        0 0 50px rgba(255, 215, 0, 0.8),
+        inset 0 0 30px rgba(255, 215, 0, 0.3);
+}
+.result-text {
+    font-size: 32px;
+    margin-bottom: 25px;
+    color: #ff6600;
+    font-weight: bold;
+    text-shadow: 0 2px 10px rgba(255, 102, 0, 0.8);
+    animation: resultPulse 1.5s ease-in-out infinite;
+}
+.restart-btn {
+    padding: 12px 40px;
+    background: linear-gradient(135deg, #ff6600 0%, #ff4500 50%, #e03e00 100%);
+    border: none;
+    border-radius: 15px;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 
+        0 6px 0 #b33c00,
+        0 8px 15px rgba(0,0,0,0.3);
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+}
+.restart-btn:hover {
+    background: linear-gradient(135deg, #ff8800 0%, #ff6600 50%, #ff4500 100%);
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 0 #b33c00,
+        0 10px 20px rgba(0,0,0,0.4);
+}
+.restart-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 0 #b33c00;
+}
+
+/* 技能特效容器 */
+.skill-effect-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 18;
+    overflow: hidden;
+}
+
+/* 炫酷技能特效 */
+.skill-effect {
+    position: absolute;
+    border-radius: 50%;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    z-index: 18;
+}
+
+/* 攻击特效 - 利爪突袭 */
+.attack-effect-special {
+    background: radial-gradient(circle, rgba(255,100,0,0.8) 0%, rgba(255,50,0,0.4) 70%, transparent 100%);
+    width: 150px;
+    height: 150px;
+    animation: attackExplode 0.8s ease-out;
+}
+
+/* 魔法特效 - 魔法飞弹 */
+.magic-effect-special {
+    background: radial-gradient(circle, rgba(150,100,255,0.8) 0%, rgba(100,50,255,0.4) 70%, transparent 100%);
+    width: 120px;
+    height: 120px;
+    animation: magicOrbit 1.2s ease-out;
+}
+
+/* 治疗特效 - 治愈舔毛 */
+.heal-effect-special {
+    background: radial-gradient(circle, rgba(100,255,100,0.8) 0%, rgba(50,200,50,0.4) 70%, transparent 100%);
+    width: 180px;
+    height: 180px;
+    animation: healPulse 1.5s ease-out;
+}
+
+/* 控制特效 - 催眠爪 */
+.control-effect-special {
+    background: radial-gradient(circle, rgba(200,100,255,0.8) 0%, rgba(150,50,200,0.4) 70%, transparent 100%);
+    width: 140px;
+    height: 140px;
+    animation: controlWave 1s ease-out;
+}
+
+/* 终极技能特效 */
+.ultimate-effect-special {
+    background: radial-gradient(circle, rgba(255,50,50,0.8) 0%, rgba(200,0,0,0.4) 70%, transparent 100%);
+    width: 300px;
+    height: 300px;
+    animation: ultimateBlast 1.5s ease-out;
+}
+
+/* 自残技能特效 */
+.self-damage-effect-special {
+    background: radial-gradient(circle, rgba(100,100,100,0.8) 0%, rgba(50,50,50,0.4) 70%, transparent 100%);
+    width: 160px;
+    height: 160px;
+    animation: selfDamagePulse 1.2s ease-out;
+}
+
+/* 动画关键帧 */
+@keyframes attackShake {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(5deg) scale(1.1); }
+    50% { transform: rotate(-5deg) scale(1.1); }
+    75% { transform: rotate(5deg) scale(1.1); }
+    100% { transform: rotate(0deg) scale(1); }
+}
+@keyframes healGlow {
+    0% { filter: brightness(1) hue-rotate(0deg); }
+    50% { filter: brightness(1.3) hue-rotate(20deg); }
+    100% { filter: brightness(1) hue-rotate(0deg); }
+}
+@keyframes controlBlur {
+    0% { filter: grayscale(0) blur(0px); }
+    50% { filter: grayscale(0.7) blur(3px); }
+    100% { filter: grayscale(0) blur(0px); }
+}
+@keyframes tipFloat {
+    0% { transform: translateX(-50%) translateY(0px); }
+    50% { transform: translateX(-50%) translateY(-10px); }
+    100% { transform: translateX(-50%) translateY(0px); }
+}
+@keyframes resultPulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* 炫酷技能特效动画 */
+@keyframes attackExplode {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    50% { transform: scale(1.5) rotate(180deg); opacity: 0.8; }
+    100% { transform: scale(3) rotate(360deg); opacity: 0; }
+}
+@keyframes magicOrbit {
+    0% { transform: translate(0, 0) scale(0); opacity: 1; }
+    30% { transform: translate(50px, -30px) scale(1); opacity: 0.9; }
+    60% { transform: translate(-50px, 30px) scale(1.2); opacity: 0.7; }
+    100% { transform: translate(0, 0) scale(2); opacity: 0; }
+}
+@keyframes healPulse {
+    0% { transform: scale(0); opacity: 1; box-shadow: 0 0 0 0 rgba(100,255,100,0.7); }
+    70% { transform: scale(1.5); opacity: 0.7; box-shadow: 0 0 0 20px rgba(100,255,100,0); }
+    100% { transform: scale(2); opacity: 0; box-shadow: 0 0 0 40px rgba(100,255,100,0); }
+}
+@keyframes controlWave {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; filter: blur(0px); }
+    50% { transform: scale(1.5) rotate(180deg); opacity: 0.8; filter: blur(5px); }
+    100% { transform: scale(3) rotate(360deg); opacity: 0; filter: blur(10px); }
+}
+@keyframes ultimateBlast {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1); opacity: 0.9; }
+    100% { transform: scale(3); opacity: 0; }
+}
+@keyframes selfDamagePulse {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+/* 宠物状态指示器 */
+.status-indicator {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #ff4444;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    z-index: 10;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.8);
+    animation: statusPulse 1s infinite;
+}
+@keyframes statusPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* ------------------- 新增：狗策划周少技能特效样式 ------------------- */
+/* buff技能特效（拒绝加班） */
+.buff-effect-special {
+    background: radial-gradient(circle, rgba(255,255,100,0.8) 0%, rgba(255,255,50,0.4) 70%, transparent 100%);
+    width: 160px;
+    height: 160px;
+    animation: buffShine 1.2s ease-out;
+}
+
+/* swap技能特效（篡改数据） */
+.swap-effect-special {
+    background: radial-gradient(circle, rgba(100,200,255,0.8) 0%, rgba(50,150,255,0.4) 70%, transparent 100%);
+    width: 200px;
+    height: 200px;
+    animation: swapSpin 1.5s ease-out;
+}
+
+/* self-destroy技能特效（提桶跑路） */
+.self-destroy-effect-special {
+    background: radial-gradient(circle, rgba(255,100,100,0.8) 0%, rgba(255,50,50,0.4) 70%, transparent 100%);
+    width: 220px;
+    height: 220px;
+    animation: destroyBlast 1s ease-out;
+}
+
+/* 新增动画关键帧 */
+@keyframes buffShine {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+}
+@keyframes swapSpin {
+    0% { transform: scale(0) rotate(0deg); opacity: 1; }
+    50% { transform: scale(1.2) rotate(180deg); opacity: 0.8; }
+    100% { transform: scale(2) rotate(360deg); opacity: 0; }
+}
+@keyframes destroyBlast {
+    0% { transform: scale(0); opacity: 1; }
+    60% { transform: scale(2); opacity: 0.9; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+/* 为新增技能按钮添加样式 */
+.skill-btn[data-type="buff"] {
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 50%, #e67e22 100%);
+    box-shadow: 0 6px 0 #d35400, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="buff"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f9e79f 0%, #f1c40f 50%, #f39c12 100%);
+    box-shadow: 0 8px 0 #d35400, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(241, 196, 15, 0.5);
+}
+.skill-btn[data-type="swap"] {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1f618d 100%);
+    box-shadow: 0 6px 0 #1f618d, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="swap"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #85c1e9 0%, #3498db 50%, #2980b9 50%);
+    box-shadow: 0 8px 0 #1f618d, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(52, 152, 219, 0.5);
+}
+.skill-btn[data-type="self-destroy"] {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #922b1f 100%);
+    box-shadow: 0 6px 0 #922b1f, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="self-destroy"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ec7063 0%, #e74c3c 50%, #c0392b 100%);
+    box-shadow: 0 8px 0 #922b1f, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(231, 76, 60, 0.5);
+}
