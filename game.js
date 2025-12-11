@@ -39,7 +39,6 @@ const allPets = {
             { id: "skill4", name: "天道！", icon: "⚡", type: "ultimate", damage: "enemyHP", pp: 1 }
         ]
     },
-    // 新增：狗策划周少
     zhoushao: {
         name: "狗策划周少",
         level: 100,
@@ -51,6 +50,20 @@ const allPets = {
             { id: "skill2", name: "拒绝加班", icon: "🚫", type: "buff", damage: 0, pp: 3 },
             { id: "skill3", name: "篡改数据", icon: "🔄", type: "swap", damage: 0, pp: 3 },
             { id: "skill4", name: "提桶跑路", icon: "🏃", type: "self-destroy", damage: 99, pp: 1 }
+        ]
+    },
+    // 新增：Q比宠物数据
+    qbi: {
+        name: "Q比",
+        level: 20,
+        maxHp: 120,
+        img: "https://s41.ax1x.com/2025/12/10/pZuHUgO.jpg",
+        description: "汪星人Q比，年糕的一生之敌，相爱相杀的戏剧每天都在上演。",
+        skills: [
+            { id: "skill1", name: "撕咬", icon: "🐶", type: "random-attack", damage: 0, pp: 5 },
+            { id: "skill2", name: "汪星咆哮", icon: "🐺", type: "fear-control", damage: 25, pp: 3 },
+            { id: "skill3", name: "狗屎", icon: "💩", type: "shit-attack", damage: 20, pp: 3 },
+            { id: "skill4", name: "拆家", icon: "🏠", type: "self-harm-attack", damage: 30, pp: 3 }
         ]
     }
 };
@@ -65,7 +78,7 @@ const gameData = {
         maxHp: 0,
         level: 0,
         isStunned: false, // 是否被控制（催眠/恐惧）
-        immune: 0 // 新增：免疫异常状态回合数
+        immune: 0 // 免疫异常状态回合数
     },
     // 敌方宠物数据
     enemy: {
@@ -73,7 +86,7 @@ const gameData = {
         maxHp: 0,
         level: 0,
         isStunned: false,
-        immune: 0 // 新增：免疫异常状态回合数
+        immune: 0 // 免疫异常状态回合数
     },
     // 技能的PP数据
     skills: {},
@@ -104,7 +117,24 @@ const enemyPetImg = document.getElementById('enemyPetImg');
 const enemyPetName = document.getElementById('enemyPetName');
 const enemyPetLevel = document.getElementById('enemyPetLevel');
 const skillEffectContainer = document.getElementById('skillEffectContainer');
-// 获取BGM元素
+// 新增：冤家路窄彩蛋容器
+// 新增：冤家路窄彩蛋容器
+const easterEggContainer = document.createElement('div');
+easterEggContainer.id = 'easterEggContainer';
+easterEggContainer.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    pointer-events: none;
+    background: transparent !important;
+`;
+battleContainer.appendChild(easterEggContainer);
 const bgm = document.getElementById('bgm');
 
 // BGM控制函数
@@ -165,6 +195,52 @@ function initGame() {
     restartBtn.addEventListener('click', restartGame);
 }
 
+// 新增：冤家路窄彩蛋显示函数
+
+function showEnemyEgg() {
+    // 先清空容器，避免重复
+    easterEggContainer.innerHTML = '';
+    const eggText = document.createElement('div');
+    eggText.className = 'enemy-egg';
+    eggText.textContent = '【冤家路窄】';
+    
+    // 修改为白字红边效果，更清晰
+    eggText.style.cssText = `
+        font-size: 72px !important;
+        color: white !important;
+        font-weight: bold !important;
+        text-shadow: 
+            3px 3px 0 #ff0000,
+            -3px 3px 0 #ff0000,
+            3px -3px 0 #ff0000,
+            -3px -3px 0 #ff0000,
+            0 0 20px #ff0000,
+            0 0 30px #ff0000,
+            0 0 40px #ff0000 !important;
+        animation: eggPulse 1s ease-in-out infinite;
+        background: rgba(0, 0, 0, 0.7) !important;
+        padding: 30px 60px;
+        border-radius: 20px;
+        white-space: nowrap;
+        z-index: 10000;
+        border: 5px solid #ff0000;
+        box-shadow: 0 0 50px rgba(255, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+    `;
+    
+    easterEggContainer.appendChild(eggText);
+    
+    // 确保容器显示
+    easterEggContainer.style.display = 'flex';
+    easterEggContainer.style.zIndex = '9999';
+    
+    // 3秒后隐藏
+    setTimeout(() => {
+        easterEggContainer.style.display = 'none';
+        easterEggContainer.innerHTML = '';
+    }, 3000);
+}
+
 // 开始战斗
 function startBattle(playerPetKey) {
     // 隐藏选择界面，显示战斗界面
@@ -209,8 +285,15 @@ function startBattle(playerPetKey) {
     // 播放背景BGM
     playBGM();
 
-    // 初始化战斗日志
-    battleLog.innerHTML = `[系统] 战斗开始！玩家选择了${playerPet.name}，敌方是${enemyPet.name}！`;
+    // 新增：冤家路窄彩蛋（Q比 vs 年糕）
+    if ((playerPetKey === 'qbi' && gameData.enemyPetKey === 'niangao') || 
+        (playerPetKey === 'niangao' && gameData.enemyPetKey === 'qbi')) {
+        showEnemyEgg(); // 显示彩蛋
+        battleLog.innerHTML = `[系统] 战斗开始！<span style="color:red;font-size:18px;">【冤家路窄】</span>玩家选择了${playerPet.name}，敌方是${enemyPet.name}！`;
+    } else {
+        // 初始化战斗日志
+        battleLog.innerHTML = `[系统] 战斗开始！玩家选择了${playerPet.name}，敌方是${enemyPet.name}！`;
+    }
 
     // 开始第一回合
     startPlayerTurn();
@@ -437,6 +520,72 @@ function executeSkill(skill) {
                 playerPetImg.classList.remove('attack-effect');
             }, 500);
             break;
+
+        // 新增：Q比专属技能 - 随机撕咬
+        case 'random-attack':
+            const randomDamage = Math.floor(Math.random() * 21) + 10; // 10-30随机伤害
+            gameData.enemy.hp = Math.max(0, gameData.enemy.hp - randomDamage);
+            enemyPetImg.classList.add('attack-effect');
+            addBattleLog(`${playerPet.name}使出撕咬！造成了${randomDamage}点随机伤害！`);
+            setTimeout(() => {
+                enemyPetImg.classList.remove('attack-effect');
+            }, 500);
+            break;
+
+        // 新增：Q比专属技能 - 汪星咆哮（恐惧控制）
+        case 'fear-control':
+            if (gameData.enemy.immune > 0) {
+                addBattleLog(`${enemyPet.name}免疫了恐惧效果！`);
+            } else {
+                // 50%概率恐惧
+                const fearChance = 50;
+                const isFearSuccess = Math.random() * 100 < fearChance;
+                
+                // 基础伤害
+                gameData.enemy.hp = Math.max(0, gameData.enemy.hp - skill.damage);
+                enemyPetImg.classList.add('attack-effect');
+                addBattleLog(`${playerPet.name}发出汪星咆哮！造成${skill.damage}点伤害！`);
+                
+                if (isFearSuccess) {
+                    gameData.enemy.isStunned = true;
+                    enemyPetImg.classList.add('control-effect');
+                    addBattleLog(`${enemyPet.name}被恐惧了！下一回合无法行动！`);
+                } else {
+                    addBattleLog(`${enemyPet.name}抵抗了恐惧效果！`);
+                }
+                setTimeout(() => {
+                    enemyPetImg.classList.remove('attack-effect', 'control-effect');
+                }, 1000);
+            }
+            break;
+
+        // 新增：Q比专属技能 - 狗屎攻击（带大便特效）
+        case 'shit-attack':
+            gameData.enemy.hp = Math.max(0, gameData.enemy.hp - skill.damage);
+            enemyPetImg.classList.add('attack-effect');
+            // 显示大便特效
+            showShitEffect();
+            addBattleLog(`${playerPet.name}扔出一坨狗屎！${enemyPet.name}受到${skill.damage}点伤害！`);
+            setTimeout(() => {
+                enemyPetImg.classList.remove('attack-effect');
+            }, 500);
+            break;
+
+        // 新增：Q比专属技能 - 拆家（自残+高伤害）
+        case 'self-harm-attack':
+            // 自身扣20HP
+            gameData.player.hp = Math.max(0, gameData.player.hp - 20);
+            // 敌方扣30HP
+            gameData.enemy.hp = Math.max(0, gameData.enemy.hp - skill.damage);
+            playerPetImg.classList.add('attack-effect');
+            enemyPetImg.classList.add('attack-effect');
+            addBattleLog(`${playerPet.name}疯狂拆家！自身损失20HP，对${enemyPet.name}造成${skill.damage}点伤害！`);
+            updateHpUI();
+            setTimeout(() => {
+                playerPetImg.classList.remove('attack-effect');
+                enemyPetImg.classList.remove('attack-effect');
+            }, 800);
+            break;
     }
     
     // 更新HP显示
@@ -449,6 +598,26 @@ function executeSkill(skill) {
     
     // 结束玩家回合，开始敌方回合
     setTimeout(endPlayerTurn, 1500);
+}
+
+// 新增：显示大便特效
+function showShitEffect() {
+    const shitEffect = document.createElement('div');
+    shitEffect.className = 'shit-effect';
+    shitEffect.innerHTML = '💩';
+    skillEffectContainer.appendChild(shitEffect);
+    
+    // 动画：大便从玩家位置飞到敌方位置
+    setTimeout(() => {
+        shitEffect.style.left = '70%';
+        shitEffect.style.top = '30%';
+        shitEffect.style.transform = 'scale(3) rotate(720deg)';
+    }, 100);
+    
+    // 动画结束后移除
+    setTimeout(() => {
+        shitEffect.remove();
+    }, 1500);
 }
 
 // 显示技能特效
@@ -704,6 +873,72 @@ function executeEnemySkill(skill) {
             setTimeout(() => {
                 enemyPetImg.classList.remove('attack-effect');
             }, 500);
+            break;
+
+        // 新增：Q比专属技能 - 随机撕咬
+        case 'random-attack':
+            const randomDamage = Math.floor(Math.random() * 21) + 10; // 10-30随机伤害
+            gameData.player.hp = Math.max(0, gameData.player.hp - randomDamage);
+            playerPetImg.classList.add('attack-effect');
+            addBattleLog(`${enemyPet.name}使出撕咬！造成了${randomDamage}点随机伤害！`);
+            setTimeout(() => {
+                playerPetImg.classList.remove('attack-effect');
+            }, 500);
+            break;
+
+        // 新增：Q比专属技能 - 汪星咆哮（恐惧控制）
+        case 'fear-control':
+            if (gameData.player.immune > 0) {
+                addBattleLog(`${playerPet.name}免疫了恐惧效果！`);
+            } else {
+                // 50%概率恐惧
+                const fearChance = 50;
+                const isFearSuccess = Math.random() * 100 < fearChance;
+                
+                // 基础伤害
+                gameData.player.hp = Math.max(0, gameData.player.hp - skill.damage);
+                playerPetImg.classList.add('attack-effect');
+                addBattleLog(`${enemyPet.name}发出汪星咆哮！造成${skill.damage}点伤害！`);
+                
+                if (isFearSuccess) {
+                    gameData.player.isStunned = true;
+                    playerPetImg.classList.add('control-effect');
+                    addBattleLog(`${playerPet.name}被恐惧了！下一回合无法行动！`);
+                } else {
+                    addBattleLog(`${playerPet.name}抵抗了恐惧效果！`);
+                }
+                setTimeout(() => {
+                    playerPetImg.classList.remove('attack-effect', 'control-effect');
+                }, 1000);
+            }
+            break;
+
+        // 新增：Q比专属技能 - 狗屎攻击（带大便特效）
+        case 'shit-attack':
+            gameData.player.hp = Math.max(0, gameData.player.hp - skill.damage);
+            playerPetImg.classList.add('attack-effect');
+            // 显示大便特效
+            showShitEffect();
+            addBattleLog(`${enemyPet.name}扔出一坨狗屎！${playerPet.name}受到${skill.damage}点伤害！`);
+            setTimeout(() => {
+                playerPetImg.classList.remove('attack-effect');
+            }, 500);
+            break;
+
+        // 新增：Q比专属技能 - 拆家（自残+高伤害）
+        case 'self-harm-attack':
+            // 敌方自身扣20HP
+            gameData.enemy.hp = Math.max(0, gameData.enemy.hp - 20);
+            // 玩家扣30HP
+            gameData.player.hp = Math.max(0, gameData.player.hp - skill.damage);
+            playerPetImg.classList.add('attack-effect');
+            enemyPetImg.classList.add('attack-effect');
+            addBattleLog(`${enemyPet.name}疯狂拆家！自身损失20HP，对${playerPet.name}造成${skill.damage}点伤害！`);
+            updateHpUI();
+            setTimeout(() => {
+                playerPetImg.classList.remove('attack-effect');
+                enemyPetImg.classList.remove('attack-effect');
+            }, 800);
             break;
     }
     

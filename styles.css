@@ -749,3 +749,129 @@ body {
     background: linear-gradient(135deg, #ec7063 0%, #e74c3c 50%, #c0392b 100%);
     box-shadow: 0 8px 0 #922b1f, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(231, 76, 60, 0.5);
 }
+/* ------------------- 新增：Q比专属样式 ------------------- */
+/* 冤家路窄彩蛋样式 */
+/* 保留并增强 .enemy-egg 样式 */
+.enemy-egg {
+    font-size: 60px !important;
+    color: red !important;
+    font-weight: bold !important;
+    text-shadow: 
+        0 0 10px red,
+        0 0 20px red,
+        0 0 30px red,
+        0 0 40px #ff0000,
+        0 0 70px #ff0000,
+        0 0 80px #ff0000,
+        0 0 100px #ff0000,
+        0 0 150px #ff0000 !important;
+    animation: eggPulse 1s ease-in-out infinite;
+    background: transparent !important;
+    padding: 20px 40px;
+    white-space: nowrap;
+    position: relative;
+    z-index: 10000 !important;
+}
+
+@keyframes eggPulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+/* 大便特效样式 */
+.shit-effect {
+    position: absolute;
+    left: 30%;
+    top: 60%;
+    font-size: 40px;
+    z-index: 99;
+    transition: all 1s ease-in-out;
+    transform: scale(1);
+    animation: shitRotate 1s linear infinite;
+}
+@keyframes shitRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Q比技能按钮样式 */
+.skill-btn[data-type="random-attack"] {
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 50%, #a569bd 100%);
+    box-shadow: 0 6px 0 #6c3483, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="random-attack"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #7d3c98 100%);
+    box-shadow: 0 8px 0 #6c3483, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(142, 68, 173, 0.5);
+}
+.skill-btn[data-type="fear-control"] {
+    background: linear-gradient(135deg, #e74c3c 0%, #ec7063 50%, #f1948a 100%);
+    box-shadow: 0 6px 0 #c0392b, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="fear-control"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ec7063 0%, #e74c3c 50%, #c0392b 100%);
+    box-shadow: 0 8px 0 #c0392b, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(231, 76, 60, 0.5);
+}
+.skill-btn[data-type="shit-attack"] {
+    background: linear-gradient(135deg, #f39c12 0%, #f1c40f 50%, #f7dc6f 100%);
+    box-shadow: 0 6px 0 #d35400, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="shit-attack"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 50%, #e67e22 100%);
+    box-shadow: 0 8px 0 #d35400, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(243, 156, 18, 0.5);
+}
+.skill-btn[data-type="self-harm-attack"] {
+    background: linear-gradient(135deg, #34495e 0%, #2c3e50 50%, #212f3d 100%);
+    box-shadow: 0 6px 0 #1c2833, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="self-harm-attack"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5d6d7e 0%, #34495e 50%, #2c3e50 100%);
+    box-shadow: 0 8px 0 #1c2833, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(52, 73, 94, 0.5);
+}
+
+/* Q比技能特效 */
+.random-attack-effect-special {
+    background: radial-gradient(circle, rgba(255,150,0,0.8) 0%, rgba(255,100,0,0.4) 70%, transparent 100%);
+    width: 180px;
+    height: 180px;
+    animation: randomAttack 1s ease-out;
+}
+.fear-control-effect-special {
+    background: radial-gradient(circle, rgba(100,50,150,0.8) 0%, rgba(80,30,120,0.4) 70%, transparent 100%);
+    width: 160px;
+    height: 160px;
+    animation: fearWave 1.2s ease-out;
+}
+.shit-attack-effect-special {
+    background: radial-gradient(circle, rgba(200,150,0,0.8) 0%, rgba(180,130,0,0.4) 70%, transparent 100%);
+    width: 140px;
+    height: 140px;
+    animation: shitSplash 0.8s ease-out;
+}
+.self-harm-attack-effect-special {
+    background: radial-gradient(circle, rgba(80,80,80,0.8) 0%, rgba(50,50,50,0.4) 70%, transparent 100%);
+    width: 200px;
+    height: 200px;
+    animation: destroyHome 1.5s ease-out;
+}
+
+/* Q比技能动画 */
+@keyframes randomAttack {
+    0% { transform: scale(0); opacity: 1; }
+    40% { transform: scale(1.8); opacity: 0.9; }
+    100% { transform: scale(3); opacity: 0; }
+}
+@keyframes fearWave {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1.5) rotate(90deg); opacity: 0.8; }
+    100% { transform: scale(2.5) rotate(180deg); opacity: 0; }
+}
+@keyframes shitSplash {
+    0% { transform: scale(0); opacity: 1; }
+    60% { transform: scale(1.5); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+}
+@keyframes destroyHome {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.9; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
