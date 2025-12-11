@@ -1,4 +1,12 @@
-// 所有宠物数据
+// ==================== 主页相关变量 ====================
+const homeContainer = document.getElementById('homeContainer');
+const storyModeBtn = document.getElementById('storyModeBtn');
+const battleModeBtn = document.getElementById('battleModeBtn');
+const homeBgm = document.getElementById('homeBgm');
+const battleBgm = document.getElementById('battleBgm'); // 修改原来的bgm引用
+// ==================== 新增：剧情模式背景音乐 ====================
+const storyBgm = new Audio('bgm/story-1.mp3');
+// ==================== 游戏核心数据 ====================
 const allPets = {
     niangao: {
         name: "年糕",
@@ -161,7 +169,167 @@ const enemyPetImg = document.getElementById('enemyPetImg');
 const enemyPetName = document.getElementById('enemyPetName');
 const enemyPetLevel = document.getElementById('enemyPetLevel');
 const skillEffectContainer = document.getElementById('skillEffectContainer');
-const bgm = document.getElementById('bgm');
+
+// ==================== 新增：剧情模式相关 ====================
+// 在文件顶部添加
+let storyModeActive = false;
+
+// 修改原来的剧情模式处理函数
+function storyModeHandler() {
+    console.log("进入剧情模式");
+    
+    // 暂停主页音乐
+    pauseHomeBGM();
+    
+    // 隐藏主页和所有其他容器
+    homeContainer.style.display = 'none';
+    petSelectContainer.style.display = 'none';
+    battleContainer.style.display = 'none';
+    
+    // 显示剧情容器并居中
+    const storyContainer = document.getElementById('storyContainer');
+    if (storyContainer) {
+        storyContainer.style.display = 'flex';
+        storyContainer.style.position = 'absolute';
+        storyContainer.style.top = '50%';
+        storyContainer.style.left = '50%';
+        storyContainer.style.transform = 'translate(-50%, -50%)';
+        
+        // 初始化剧情选择界面
+        initStorySelection();
+        
+        // 播放剧情BGM
+        setTimeout(() => {
+            playStoryBGM();
+        }, 500);
+    } else {
+        console.error('剧情容器未找到');
+    }
+}
+
+// 初始化剧情选择
+function initStorySelection() {
+    const storyList = document.getElementById('storyList');
+    if (!storyList) return;
+    
+    storyList.innerHTML = `
+        <div class="story-option" onclick="startStory('story1')">
+            <h3>剧情一：张总的离职</h3>
+            <p>张儒松突然离职，留下年糕和小宝。你需要揭开背后的秘密...</p>
+            <div class="story-tags">
+                <span>冒险</span>
+                <span>解谜</span>
+                <span>对战</span>
+            </div>
+        </div>
+        <div class="story-option coming-soon">
+            <h3>剧情二：周少的阴谋</h3>
+            <p>（开发中）狗策划周少似乎在谋划着什么...</p>
+            <div class="story-tags">
+                <span>阴谋</span>
+                <span>反转</span>
+            </div>
+        </div>
+        <div class="story-option coming-soon">
+            <h3>剧情三：Q比的复仇</h3>
+            <p>（开发中）年糕的老对手Q比正在筹划一场复仇大戏...</p>
+            <div class="story-tags">
+                <span>复仇</span>
+                <span>搞笑</span>
+            </div>
+        </div>
+        <div class="story-option coming-soon">
+            <h3>剧情四：孙子晨的觉醒</h3>
+            <p>（开发中）孙子晨终于决定认真健身了！</p>
+            <div class="story-tags">
+                <span>成长</span>
+                <span>励志</span>
+            </div>
+        </div>
+
+    `;
+}
+
+// 开始剧情
+function startStory(storyId) {
+    // 隐藏剧情选择，显示剧情界面
+    document.getElementById('storySelection').style.display = 'none';
+    document.getElementById('storyUI').style.display = 'block';
+    
+    // 开始剧情
+    StoryManager.startStory(storyId);
+}
+
+// 创建临时的剧情选择界面
+function createStorySelection() {
+    const tempContainer = document.createElement('div');
+    tempContainer.id = 'tempStorySelection';
+    tempContainer.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        color: white;
+    `;
+    
+    tempContainer.innerHTML = `
+        <h2 style="color:#ffd700; margin-bottom:30px;">选择剧情</h2>
+        <div style="display:flex; flex-direction:column; gap:20px; max-width:600px;">
+            <button onclick="loadStory('story1')" style="
+                padding: 20px;
+                background: linear-gradient(135deg, #3498db, #2980b9);
+                border: none;
+                border-radius: 10px;
+                color: white;
+                font-size: 18px;
+                cursor: pointer;
+            ">
+                <h3>剧情一：张总的离职</h3>
+                <p>张儒松突然离职，你需要照顾年糕和小宝，并揭开背后的秘密...</p>
+            </button>
+            <button style="
+                padding: 20px;
+                background: linear-gradient(135deg, #555, #333);
+                border: none;
+                border-radius: 10px;
+                color: #888;
+                font-size: 18px;
+                cursor: not-allowed;
+            ">
+                <h3>更多剧情开发中...</h3>
+                <p>敬请期待</p>
+            </button>
+        </div>
+        <button onclick="returnToHome()" style="
+            margin-top: 40px;
+            padding: 10px 30px;
+            background: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        ">返回主页</button>
+    `;
+    
+    document.body.appendChild(tempContainer);
+    
+    // 定义临时函数
+    window.loadStory = function(storyId) {
+        document.body.removeChild(tempContainer);
+        // 这里可以加载正式的剧情界面
+        alert(`开始剧情: ${storyId}\n(正式版将包含完整剧情界面)`);
+        returnToHome();
+    };
+}
+
+
 
 // 新增：冤家路窄彩蛋容器
 const easterEggContainer = document.createElement('div');
@@ -181,51 +349,200 @@ easterEggContainer.style.cssText = `
 `;
 battleContainer.appendChild(easterEggContainer);
 
-// 等待DOM加载完成后执行初始化
-// 替换原有的 DOMContentLoaded 事件处理
-window.addEventListener('load', function() {
-    // 重新获取元素
-    const petOptions = document.querySelectorAll('.pet-option');
-    const startBattleBtn = document.getElementById('startBattleBtn');
+// ==================== 主页功能函数 ====================
 
-    // 强制启用按钮
-    startBattleBtn.disabled = false;
-    startBattleBtn.style.pointerEvents = 'auto';
-
-    // 绑定事件
-    petOptions.forEach(option => {
-        option.addEventListener('click', petSelectHandler);
-    });
-
-    startBattleBtn.addEventListener('click', startBattleHandler);
-});
-
-// BGM控制函数
-function playBGM() {
-    bgm.volume = 0.6;
-    bgm.play().catch(error => {
-        console.log("BGM自动播放失败，需用户交互触发：", error);
+// 主页背景音乐控制函数
+function playHomeBGM() {
+    homeBgm.volume = 0.5;
+    homeBgm.play().catch(error => {
+        console.log("主页BGM自动播放失败，需用户交互触发：", error);
         document.addEventListener('click', () => {
-            bgm.play();
+            homeBgm.play();
         }, { once: true });
     });
 }
 
-function pauseBGM() {
-    bgm.pause();
+function pauseHomeBGM() {
+    homeBgm.pause();
 }
 
-function resumeBGM() {
-    bgm.play();
+// 剧情背景音乐控制函数
+function playStoryBGM() {
+    storyBgm.volume = 0.4;
+    storyBgm.loop = true;
+    storyBgm.play().catch(error => {
+        console.log("剧情BGM自动播放失败：", error);
+        // 用户交互后自动播放
+        document.addEventListener('click', () => {
+            storyBgm.play();
+        }, { once: true });
+    });
 }
+
+function pauseStoryBGM() {
+    storyBgm.pause();
+    storyBgm.currentTime = 0;
+}
+// 对战背景音乐控制函数
+function playBattleBGM() {
+    battleBgm.volume = 0.6;
+    battleBgm.play().catch(error => {
+        console.log("对战BGM自动播放失败：", error);
+    });
+}
+
+function pauseBattleBGM() {
+    battleBgm.pause();
+}
+
+function resumeBattleBGM() {
+    battleBgm.play();
+}
+
+
+
+// 对战模式处理函数
+function battleModeHandler() {
+    // 暂停主页音乐
+    pauseHomeBGM();
+    
+    // 隐藏主页，显示宠物选择界面
+    homeContainer.style.display = 'none';
+    petSelectContainer.style.display = 'flex';
+    
+    // 重置选择状态
+    gameData.playerPetKey = null;
+    document.querySelectorAll('.pet-option').forEach(opt => opt.classList.remove('selected'));
+}
+
+// 返回主页函数
+function returnToHome() {
+    console.log("返回主页");
+    
+    // 暂停所有音乐
+    pauseBattleBGM();
+    pauseStoryBGM();
+    
+    // 隐藏所有界面
+    battleContainer.style.display = 'none';
+    petSelectContainer.style.display = 'none';
+    
+    const storyContainer = document.getElementById('storyContainer');
+    if (storyContainer) {
+        storyContainer.style.display = 'none';
+    }
+    
+    const storyUI = document.getElementById('storyUI');
+    if (storyUI) {
+        storyUI.style.display = 'none';
+    }
+    
+    // 显示剧情选择界面（重置状态）
+    const storySelection = document.getElementById('storySelection');
+    if (storySelection) {
+        storySelection.style.display = 'block';
+    }
+    
+    // 显示主页
+    homeContainer.style.display = 'flex';
+    
+    // 播放主页音乐
+    playHomeBGM();
+    
+    // 重置游戏数据
+    gameData.isBattleEnd = false;
+    gameData.currentRound = 1;
+    gameData.isEnemyTurn = false;
+    gameData.player.immune = 0;
+    gameData.enemy.immune = 0;
+    
+    Object.values(allPets).forEach(pet => {
+        pet.hasGymCard = false;
+        pet.dreamTurns = 0;
+    });
+}
+// ==================== 新增：返回对战模式函数 ====================
+function returnToBattleMode() {
+    console.log("返回对战模式");
+    
+    // 暂停剧情BGM
+    pauseStoryBGM();
+    
+    // 隐藏剧情容器
+    const storyContainer = document.getElementById('storyContainer');
+    if (storyContainer) {
+        storyContainer.style.display = 'none';
+    }
+    
+    // 显示宠物选择界面
+    homeContainer.style.display = 'none';
+    petSelectContainer.style.display = 'flex';
+    
+    // 播放主页音乐
+    playHomeBGM();
+}
+// ============ 在这里添加 returnToStorySelection 函数 ============
+function returnToStorySelection() {
+    // 隐藏剧情播放界面
+    document.getElementById('storyUI').style.display = 'none';
+    // 显示剧情选择界面
+    document.getElementById('storySelection').style.display = 'block';
+}
+
+// ==================== 游戏核心函数 ====================
+
+// 页面加载完成后执行初始化
+window.addEventListener('load', function() {
+    // 初始显示主页
+    homeContainer.style.display = 'flex';
+    petSelectContainer.style.display = 'none';
+    battleContainer.style.display = 'none';
+    
+    // 播放主页背景音乐
+    playHomeBGM();
+     // 预加载剧情BGM
+    storyBgm.preload = 'auto';
+    storyBgm.load();
+    
+    // 绑定主页按钮事件
+    storyModeBtn.addEventListener('click', storyModeHandler);
+    battleModeBtn.addEventListener('click', battleModeHandler);
+    
+    // 绑定宠物选择相关事件
+    const petOptions = document.querySelectorAll('.pet-option');
+    const startBattleBtn = document.getElementById('startBattleBtn');
+    
+    startBattleBtn.disabled = false;
+    startBattleBtn.style.pointerEvents = 'auto';
+    
+    petOptions.forEach(option => {
+        option.addEventListener('click', petSelectHandler);
+    });
+    
+    startBattleBtn.addEventListener('click', startBattleHandler);
+    
+    // 绑定重新开始按钮事件
+    restartBtn.addEventListener('click', restartGame);
+
+    // ============ 新增：检查剧情容器是否存在 ============
+    if (!document.getElementById('storyContainer')) {
+        console.log('剧情容器未找到，请确保HTML中已添加剧情界面');
+    } else {
+        console.log('剧情模式已就绪');
+    }
+    
+    // ============ 确保返回按钮可以正常工作 ============
+    // 如果剧情选择界面有返回按钮，确保它绑定了正确的事件
+    const returnHomeBtn = document.querySelector('.return-home-btn');
+    if (returnHomeBtn && !returnHomeBtn.onclick) {
+        returnHomeBtn.onclick = returnToHome;
+    }
+});
 
 // 宠物选择处理函数
 function petSelectHandler() {
-    // 移除其他选项的选中状态
     petOptions.forEach(opt => opt.classList.remove('selected'));
-    // 添加当前选项的选中状态
     this.classList.add('selected');
-    // 设置选中的宠物
     gameData.playerPetKey = this.dataset.pet;
     console.log('选择了宠物:', gameData.playerPetKey);
 }
@@ -237,20 +554,15 @@ function startBattleHandler() {
         return;
     }
     
-    // 开始战斗
     startBattle();
 }
 
 // 主开始战斗函数
 function startBattle() {
-    // 隐藏选择界面，显示战斗界面
     petSelectContainer.style.display = 'none';
     battleContainer.style.display = 'block';
     
-    // 确定玩家和敌方宠物
     const playerPet = allPets[gameData.playerPetKey];
-    
-    // 选择敌方宠物（不是玩家选择的那只）
     const availableEnemies = Object.keys(allPets).filter(key => key !== gameData.playerPetKey);
     gameData.enemyPetKey = availableEnemies[Math.floor(Math.random() * availableEnemies.length)];
     const enemyPet = allPets[gameData.enemyPetKey];
@@ -287,8 +599,8 @@ function startBattle() {
     updateHpUI();
     createSkillButtons(playerPet.skills);
     
-    // 播放背景BGM
-    playBGM();
+    // 播放对战BGM
+    playBattleBGM();
     
     // 彩蛋判断
     const isParentChildBattle = 
@@ -413,10 +725,7 @@ function executeSkill(skill) {
     const playerPet = allPets[gameData.playerPetKey];
     const enemyPet = allPets[gameData.enemyPetKey];
     
-    // 添加战斗日志
     addBattleLog(`${playerPet.name}使用了${skill.name}！`);
-    
-    // 显示技能特效
     showSkillEffect(skill.type, 'enemy');
     
     // 根据技能类型执行不同效果
@@ -570,7 +879,7 @@ function executeSkill(skill) {
             playerPetImg.src = playerPet.dreamImg;
             playerPetImg.classList.add('dream-effect');
             playerPet.dreamTurns = 2;
-            addBattleLog(`${playerPet.name}使用了黄粱一梦！恢复${dreamHealAmount}点HP，但接下来2回合无法行动！`);
+            addBattleLog(`${playerPet.name}使用了黄粱一梦！梦到自己变成了肌肉男，恢复${dreamHealAmount}点HP，但接下来2回合无法行动！`);
             setTimeout(() => playerPetImg.classList.remove('dream-effect'), 1000);
             break;
     }
@@ -733,7 +1042,7 @@ function checkBattleEnd() {
 function endBattle(isPlayerWin) {
     gameData.isBattleEnd = true;
     roundTip.style.display = 'none';
-    pauseBGM();
+    pauseBattleBGM();
     resultModal.style.display = 'flex';
     resultText.textContent = isPlayerWin ? '战斗胜利！' : '战斗失败！';
     addBattleLog(isPlayerWin ? `[系统] ${playerPetName.textContent}获胜！` : `[系统] ${enemyPetName.textContent}获胜！`);
@@ -809,7 +1118,6 @@ function startEnemyTurn() {
         return;
     }
     
-    // 获取敌方宠物技能
     enemyPetImg.classList.add('attack-effect');
     const availableSkills = enemyPet.skills.filter(skill => skill.pp > 0);
     const selectedSkill = availableSkills.length > 0 
@@ -820,7 +1128,6 @@ function startEnemyTurn() {
 }
 
 // 执行敌方技能
-// 执行敌方技能 - 完整版本
 function executeEnemySkill(skill) {
     const playerPet = allPets[gameData.playerPetKey];
     const enemyPet = allPets[gameData.enemyPetKey];
@@ -986,12 +1293,11 @@ function executeEnemySkill(skill) {
             enemyPetImg.src = enemyPet.dreamImg || enemyPet.img;
             enemyPetImg.classList.add('dream-effect');
             enemyPet.dreamTurns = 2;
-            addBattleLog(`${enemyPet.name}使用了黄粱一梦！恢复${dreamHealAmount}点HP，但接下来2回合无法行动！`);
+            addBattleLog(`${enemyPet.name}使用了黄粱一梦！梦到自己变成了肌肉男，恢复${dreamHealAmount}点HP，但接下来2回合无法行动！`);
             setTimeout(() => enemyPetImg.classList.remove('dream-effect'), 1000);
             break;
             
         default:
-            // 默认攻击
             const defaultDamage = calculateDamage(10, enemyPet, playerPet);
             gameData.player.hp = Math.max(0, gameData.player.hp - defaultDamage);
             playerPetImg.classList.add('attack-effect');
@@ -1043,59 +1349,14 @@ function restartGame() {
     });
     
     resultModal.style.display = 'none';
-    resumeBGM();
-    initGame();
+    resumeBattleBGM();
+    
+    // 跳转到主页
+    returnToHome();
 }
 
-// 初始化游戏
 // 初始化游戏
 function initGame() {
-    // 确保DOM元素已加载
-    if (!petSelectContainer || !battleContainer) {
-        console.error('DOM元素未找到，请检查HTML结构');
-        return;
-    }
-    
-    // 显示宠物选择界面
-    petSelectContainer.style.display = 'flex';
-    battleContainer.style.display = 'none';
-    
-    // 重置游戏数据
-    gameData.playerPetKey = null;
-    gameData.isBattleEnd = false;
-    gameData.currentRound = 1;
-    gameData.isEnemyTurn = false;
-    
-    // 清除所有宠物选项的选中状态
-    petOptions.forEach(option => option.classList.remove('selected'));
-    
-    // 重新绑定宠物选项点击事件
-    petOptions.forEach(option => {
-        // 先移除可能存在的旧事件监听器
-        option.removeEventListener('click', petSelectHandler);
-        option.addEventListener('click', petSelectHandler);
-    });
-    
-    // 重新绑定开始战斗按钮点击事件
-    startBattleBtn.removeEventListener('click', startBattleHandler);
-    startBattleBtn.addEventListener('click', startBattleHandler);
-    
-    // 重新绑定重新开始按钮点击事件
-    restartBtn.removeEventListener('click', restartGame);
-    restartBtn.addEventListener('click', restartGame);
-    
-    // 确保技能池被清空
-    skillPool.innerHTML = '';
-    
-    // 确保战斗日志被清空
-    battleLog.innerHTML = '[系统] 战斗开始！';
-    
-    // 隐藏结果弹窗
-    resultModal.style.display = 'none';
-    
-    // 重置回合提示
-    roundTip.style.display = 'none';
+    console.log('游戏初始化完成');
 }
 
-// 页面加载完成后初始化游戏
-window.addEventListener('DOMContentLoaded', initGame);

@@ -6,6 +6,22 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- 主页界面 -->
+    <div class="home-container" id="homeContainer">
+        <!-- 剧情模式按钮（左下角） -->
+        <button class="home-btn story-mode-btn" id="storyModeBtn">
+            剧情模式
+        </button>
+        
+        <!-- 对战模式按钮（右下角） -->
+        <button class="home-btn battle-mode-btn" id="battleModeBtn">
+            对战模式
+        </button>
+        
+        <!-- 主页背景音乐 -->
+        <audio id="homeBgm" src="bgm/home-music.mp3" preload="auto" loop></audio>
+    </div>
+
     <!-- 宠物选择界面 -->
     <div class="pet-select-container" id="petSelectContainer">
         <h1 class="select-title">选择你的宠物</h1>
@@ -70,7 +86,6 @@
                 </div>
             </div>
 
-
             <!-- Q比选项 -->
             <div class="pet-option" data-pet="qbi">
                 <img src="https://s41.ax1x.com/2025/12/10/pZuHUgO.jpg" alt="Q比" class="pet-option-img">
@@ -86,13 +101,13 @@
                 </div>
             </div>
 
-            <!-- 在Q比选项后面添加孙子晨选项 -->
+            <!-- 孙子晨选项 -->
             <div class="pet-option" data-pet="sunzichen">
                 <img src="https://s41.ax1x.com/2025/12/11/pZKFOtf.png" alt="孙子晨" class="pet-option-img">
                 <div class="pet-option-name">孙子晨</div>
                 <div class="pet-option-level">等级：99</div>
                 <div class="pet-option-hp">HP：80</div>
-                <div class="pet-option-desc">周少的好大儿，一直在健身的路上。走出半生，归来仍是的少年...的模样。</div>
+                <div class="pet-option-desc">周少的好大儿，一直在健身的路上。走出半生，归来仍是少年。</div>
                 <div class="pet-option-skills">
                     <div class="skill-item">💳 健身卡：减伤20%，PP1</div>
                     <div class="skill-item">💦 佯挥汗：30伤害，PP4</div>
@@ -100,9 +115,6 @@
                     <div class="skill-item">💤 黄粱一梦：恢复80HP，但2回合无法行动，PP1</div>
                 </div>
             </div>
-
-
-
         </div>
         <button class="start-battle-btn" id="startBattleBtn">开始对战</button>
     </div>
@@ -146,8 +158,8 @@
             <!-- 技能特效容器 -->
             <div class="skill-effect-container" id="skillEffectContainer"></div>
             
-            <!-- 背景BGM（新增） -->
-            <audio id="bgm" src="bgm/background-music.mp3" preload="auto" loop></audio>
+            <!-- 对战BGM -->
+            <audio id="battleBgm" src="bgm/background-music.mp3" preload="auto" loop></audio>
 
             <!-- 回合提示 -->
             <div class="round-tip" id="roundTip">你的回合！选择技能出击～</div>
@@ -172,6 +184,42 @@
         </div>
     </div>
 
+    <!-- 剧情模式容器 -->
+    <div class="story-container" id="storyContainer" style="display: none;">
+        <div class="story-selection" id="storySelection" style="display: block;">
+            <h1 class="story-selection-title">选择剧情</h1>
+            <div class="story-list" id="storyList">
+                <!-- 通过JS动态生成 -->
+            </div>
+            <div class="story-button-area">
+                <button class="return-home-btn" onclick="returnToHome()">返回主页</button>
+                <button class="return-battle-btn" onclick="returnToBattleMode()">对战模式</button>
+            </div>
+        </div>
+        
+        <!-- 剧情播放界面 -->
+        <div class="story-ui" id="storyUI" style="display: none;">
+            <div class="story-background"></div>
+            
+            <!-- 角色容器 -->
+            <div class="story-characters" id="storyCharacters"></div>
+            
+            <!-- 对话框 -->
+            <div class="story-dialog">
+                <div class="dialog-header">
+                    <h2 class="story-title" id="storyTitle"></h2>
+                </div>
+                <div class="dialog-content">
+                    <p class="story-content" id="storyContent"></p>
+                </div>
+                <div class="dialog-choices" id="storyChoices"></div>
+            </div>
+            
+            <button class="return-selection-btn" onclick="returnToStorySelection()">返回剧情选择</button>
+        </div>
+    </div>
+
+    <script src="story.js"></script>
     <script src="game.js"></script>
 </body>
 </html>
