@@ -49,6 +49,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    pointer-events: auto;
+    z-index: 10;
 }
 .pet-option:hover {
     transform: translateY(-5px);
@@ -108,6 +110,8 @@ body {
     box-shadow: 0 6px 0 #b33c00, 0 8px 15px rgba(0,0,0,0.3);
     font-weight: bold;
     transition: all 0.3s ease;
+    pointer-events: auto;
+    z-index: 10; 
 }
 .start-battle-btn:hover {
     transform: translateY(-3px);
@@ -874,4 +878,95 @@ body {
     0% { transform: scale(0); opacity: 1; }
     50% { transform: scale(1.2); opacity: 0.9; }
     100% { transform: scale(2.5); opacity: 0; }
+}
+/* ===================== 孙子晨新增样式 ===================== */
+
+/* 父子情深彩蛋样式 */
+.parent-child-egg {
+    font-size: 72px !important;
+    color: white !important;
+    font-weight: bold !important;
+    text-shadow: 
+        3px 3px 0 #ff9900,
+        -3px 3px 0 #ff9900,
+        3px -3px 0 #ff9900,
+        -3px -3px 0 #ff9900,
+        0 0 20px #ff9900,
+        0 0 30px #ff9900,
+        0 0 40px #ff9900 !important;
+    animation: eggPulse 1s ease-in-out infinite;
+    background: rgba(0, 0, 0, 0.7) !important;
+    padding: 30px 60px;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 10000;
+    border: 5px solid #ff9900;
+    box-shadow: 0 0 50px rgba(255, 153, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+/* 孙子晨技能特效样式 */
+.damage-reduce-effect-special {
+    background: radial-gradient(circle, rgba(0, 200, 255, 0.8) 0%, rgba(0, 150, 200, 0.4) 70%, transparent 100%);
+    width: 160px;
+    height: 160px;
+    animation: damageReduceShield 1.2s ease-out;
+}
+
+.dream-effect-special {
+    background: radial-gradient(circle, rgba(255, 200, 100, 0.8) 0%, rgba(255, 150, 50, 0.4) 70%, transparent 100%);
+    width: 200px;
+    height: 200px;
+    animation: dreamFloat 1.5s ease-out;
+}
+
+/* 梦境状态头像特效 */
+.dream-effect {
+    animation: dreamPulse 1s ease-in-out infinite;
+}
+
+/* 孙子晨技能按钮样式 */
+.skill-btn[data-type="damage-reduce"] {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 50%, #1f618d 100%);
+    box-shadow: 0 6px 0 #1f618d, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="damage-reduce"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #5dade2 0%, #3498db 50%, #2980b9 100%);
+    box-shadow: 0 8px 0 #1f618d, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(52, 152, 219, 0.5);
+}
+
+.skill-btn[data-type="dream"] {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 50%, #d35400 100%);
+    box-shadow: 0 6px 0 #d35400, 0 8px 15px rgba(0,0,0,0.3);
+}
+.skill-btn[data-type="dream"]:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f7dc6f 0%, #f39c12 50%, #e67e22 100%);
+    box-shadow: 0 8px 0 #d35400, 0 12px 20px rgba(0,0,0,0.4), 0 0 20px rgba(243, 156, 18, 0.5);
+}
+
+/* 孙子晨技能动画 */
+@keyframes damageReduceShield {
+    0% { transform: scale(0); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.8; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes dreamFloat {
+    0% { transform: scale(0) translateY(0); opacity: 1; }
+    50% { transform: scale(1.2) translateY(-20px); opacity: 0.9; }
+    100% { transform: scale(2) translateY(-40px); opacity: 0; }
+}
+
+@keyframes dreamPulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+/* 添加在 styles.css 文件末尾 */
+.pet-select-container {
+    display: flex; /* 使用 !important 确保显示 */
+}
+
+.battle-container {
+    display: none; /* 使用 !important 确保隐藏 */
 }
