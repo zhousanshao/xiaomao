@@ -351,7 +351,6 @@ battleContainer.appendChild(easterEggContainer);
 
 // ==================== 主页功能函数 ====================
 
-// 主页背景音乐控制函数
 function playHomeBGM() {
     // 先停止其他所有 BGM，避免重叠
     stopAllBGM();
@@ -378,6 +377,7 @@ function playStoryBGM() {
     storyBgm.loop = true;
     storyBgm.play().catch(error => {
         console.log("剧情BGM自动播放失败：", error);
+        // 用户交互后自动播放
         document.addEventListener('click', () => {
             storyBgm.play();
         }, { once: true });
@@ -388,6 +388,7 @@ function pauseStoryBGM() {
     storyBgm.pause();
     storyBgm.currentTime = 0;
 }
+
 // 对战背景音乐控制函数
 function playBattleBGM() {
     // 先停止其他所有 BGM，避免重叠
@@ -419,9 +420,6 @@ function stopAllBGM() {
     try { if (battleBgm) battleBgm.currentTime = 0; } catch (e) {}
     try { if (storyBgm) storyBgm.currentTime = 0; } catch (e) {}
 }
-
-
-
 // 对战模式处理函数
 function battleModeHandler() {
     // 暂停主页音乐
